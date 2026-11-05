@@ -81,14 +81,31 @@ private readonly Queue<string> _instructions = new();
     }
 
 
-    public int AddIngredientsToShoppingList(int recipeId) =>
-        throw new NotImplementedException("Part A: implement AddIngredientsToShoppingList.");
+    public int AddIngredientsToShoppingList(int recipeId)
+    {
+        if (!_recipes.TryGetValue(recipeId, out Recipe? recipe))
+        {
+            return 0;
+        }
+        foreach (string ingredient in recipe.Ingredients)
+        {
+            _shoppingList.Add(ingredient);
+        }
+        return recipe.Ingredients.Count;
+    }
 
-    public IReadOnlyList<string> GetShoppingList() =>
-        throw new NotImplementedException("Part A: implement GetShoppingList.");
 
-    public void ClearShoppingList() =>
-        throw new NotImplementedException("Part A: implement ClearShoppingList.");
+    public IReadOnlyList<string> GetShoppingList()
+    {
+        return _shoppingList.ToArray();
+    }
+
+
+    public void ClearShoppingList()
+    {
+        _shoppingList.Clear();
+    }
+
 
     public bool AddRecipeToCookingPlan(int recipeId) =>
         throw new NotImplementedException("Part A: implement AddRecipeToCookingPlan.");
