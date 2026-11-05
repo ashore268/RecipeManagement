@@ -20,7 +20,27 @@ private readonly Queue<string> _instructions = new();
     public RecipeManager(IEnumerable<Recipe> recipes)
     {
         // TODO Part A: validate recipes and build Dictionary<int, Recipe>.
-        _ = recipes;
+    foreach (Recipe recipe in recipes)
+{
+    if (recipe is null)
+    {
+        throw new ArgumentException("A recipe in the supplied list is null.");
+    }
+    if (recipe.Id <= 0)
+    {
+        throw new ArgumentException($"Recipe ID must be a positive number: {recipe.Id}.");
+    }
+    if (string.IsNullOrWhiteSpace(recipe.Title))
+    {
+        throw new ArgumentException($"Recipe {recipe.Id} has a blank title.");
+    }
+    if (_recipes.ContainsKey(recipe.Id))
+    {
+        throw new ArgumentException($"Duplicate recipe ID: {recipe.Id}.");
+    }
+    _recipes.Add(recipe.Id, recipe);
+}
+
     }
 
     public int RecipeCount => 0;
