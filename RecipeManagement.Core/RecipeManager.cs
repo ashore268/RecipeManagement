@@ -107,29 +107,82 @@ private readonly Queue<string> _instructions = new();
     }
 
 
-    public bool AddRecipeToCookingPlan(int recipeId) =>
-        throw new NotImplementedException("Part A: implement AddRecipeToCookingPlan.");
+    public bool AddRecipeToCookingPlan(int recipeId)
+    {
+        if (!_recipes.ContainsKey(recipeId) || _cookingPlan.Contains(recipeId))
+        {
+            return false;
+        }
+        _cookingPlan.AddLast(recipeId);
+        return true;
+    }
 
-    public bool RemoveRecipeFromCookingPlan(int recipeId) =>
-        throw new NotImplementedException("Part A: implement RemoveRecipeFromCookingPlan.");
 
-    public bool RestoreLastRemovedRecipe() =>
-        throw new NotImplementedException("Part A: implement RestoreLastRemovedRecipe.");
+    public bool RemoveRecipeFromCookingPlan(int recipeId)
+    {
+        if (!_cookingPlan.Remove(recipeId))
+        {
+            return false;
+        }
+        _removedRecipes.Push(recipeId);
+        return true;
+    }
 
-    public int? PeekLastRemovedRecipe() =>
-        throw new NotImplementedException("Part A: implement PeekLastRemovedRecipe.");
 
-    public IReadOnlyList<int> GetCookingPlan() =>
-        throw new NotImplementedException("Part A: implement GetCookingPlan.");
+    public bool RestoreLastRemovedRecipe()
+    {
+        if (_removedRecipes.Count == 0)
+        {
+            return false;
+        }
+        int recipeId = _removedRecipes.Pop();
+        if (!_recipes.ContainsKey(recipeId) || _cookingPlan.Contains(recipeId))
+        {
+            return false;
+        }
+        _cookingPlan.AddLast(recipeId);
+        return true;
+    }
 
-    public bool StartCooking(int recipeId) =>
-        throw new NotImplementedException("Part A: implement StartCooking.");
 
-    public string? PeekNextInstruction() =>
-        throw new NotImplementedException("Part A: implement PeekNextInstruction.");
+    public int? PeekLastRemovedRecipe()
+    {
+        return _removedRecipes.Count == 0 ? null : _removedRecipes.Peek();
+    }
 
-    public string? CompleteNextInstruction() =>
-        throw new NotImplementedException("Part A: implement CompleteNextInstruction.");
+
+    public IReadOnlyList<int> GetCookingPlan()
+    {
+        return _cookingPlan.ToArray();
+    }
+
+
+    public bool StartCooking(int recipeId)
+    {
+        if (!_recipes.TryGetValue(recipeId, out Recipe? recipe) || recipe.Instructions.Count == 0)
+        {
+            return false;
+        }
+        _instructions.Clear();
+        foreach (string instruction in recipe.Instructions)
+        {
+            _instructions.Enqueue(instruction);
+        }
+        return true;
+    }
+
+
+    public string? PeekNextInstruction()
+    {
+        return _instructions.Count == 0 ? null : _instructions.Peek();
+    }
+
+
+    public string? CompleteNextInstruction()
+    {
+        return _instructions.Count == 0 ? null : _instructions.Dequeue();
+    }
+
 
     public IReadOnlyList<Recipe> SearchByTitle(string searchText) =>
         throw new NotImplementedException("Part B: implement SearchByTitle.");
