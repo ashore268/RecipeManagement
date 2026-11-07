@@ -15,6 +15,8 @@ private readonly List<string> _shoppingList = new();
 private readonly LinkedList<int> _cookingPlan = new();
 private readonly Stack<int> _removedRecipes = new();
 private readonly Queue<string> _instructions = new();
+private readonly HashSet<int> _savedRecipes = new();
+
 
 
     public RecipeManager(IEnumerable<Recipe> recipes)
@@ -184,24 +186,71 @@ private readonly Queue<string> _instructions = new();
     }
 
 
-    public IReadOnlyList<Recipe> SearchByTitle(string searchText) =>
-        throw new NotImplementedException("Part B: implement SearchByTitle.");
+    public IReadOnlyList<Recipe> SearchByTitle(string searchText)
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            return _recipes.Values.ToList();
+        }
+        return _recipes.Values
+            .Where(r => r.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
 
-    public IReadOnlyList<Recipe> SearchByIngredient(string searchText) =>
-        throw new NotImplementedException("Part B: implement SearchByIngredient.");
 
-    public IReadOnlyList<Recipe> GetHighestProteinRecipes(int count) =>
-        throw new NotImplementedException("Part B: implement GetHighestProteinRecipes.");
+    public IReadOnlyList<Recipe> SearchByIngredient(string searchText)
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            return new List<Recipe>();
+        }
+        return _recipes.Values
+            .Where(r => r.Ingredients.Any(
+                ing => ing.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
+            .ToList();
+    }
 
-    public bool AddSavedRecipe(int recipeId) =>
-        throw new NotImplementedException("Part B: implement AddSavedRecipe.");
 
-    public bool RemoveSavedRecipe(int recipeId) =>
-        throw new NotImplementedException("Part B: implement RemoveSavedRecipe.");
+    public IReadOnlyList<Recipe> GetHighestProteinRecipes(int count)
+    {
+        if (count <= 0)
+        {
+            return new List<Recipe>();
+        }
+        return _recipes.Values
+            .Where(r => r.Nutrition is not null && r.Nutrition.ProteinG.HasValue)
+            .OrderByDescending(r => r.Nutrition!.ProteinG!.Value)
+            .Take(count)
+            .ToList();
+    }
 
-    public bool IsRecipeSaved(int recipeId) =>
-        throw new NotImplementedException("Part B: implement IsRecipeSaved.");
 
-    public IReadOnlyList<int> GetSavedRecipes() =>
-        throw new NotImplementedException("Part B: implement GetSavedRecipes.");
+    public bool AddSavedRecipe(int recipeId)
+    {
+        if (!_recipes.ContainsKey(recipeId))
+        {
+            return false;
+        }
+        return _savedRecipes.Add(recipeId);
+    }
+
+
+
+    public bool RemoveSavedRecipe(int recipeId)
+    {
+        return _savedRecipes.Remove(recipeId);
+    }
+
+
+    public bool IsRecipeSaved(int recipeId)
+    {
+        return _savedRecipes.Contains(recipeId);
+    }
+
+
+    public IReadOnlyList<int> GetSavedRecipes()
+    {
+        return _savedRecipes.ToList();
+    }
+
 }
